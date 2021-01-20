@@ -1,4 +1,4 @@
-''' In this code we will write code for training the model'''
+""" In this code we will write code for training the model"""
 
 import config
 import feature_engg
@@ -13,30 +13,34 @@ from sklearn import model_selection
 
 
 def run(dataset, fold, GRIDCV):
-    '''
+    """
 
     :param dataset: training data
     :param fold: for skfold
     :return: trained model
-    '''
+    """
 
     # create train and valid splits
     train_set = dataset[dataset.kfold != fold]
     validation_set = dataset[dataset.kfold == fold]
 
     # get X train, y train
-    X_train = train_set.drop([1, config.KFOLD_COLUMN_NAME], axis=1, inplace=False).values
+    X_train = train_set.drop(
+        [1, config.KFOLD_COLUMN_NAME], axis=1, inplace=False
+    ).values
     y_train = train_set[1].values
 
     # get X valid, y valid
-    X_valid = validation_set.drop([1, config.KFOLD_COLUMN_NAME], axis=1, inplace=False).values
+    X_valid = validation_set.drop(
+        [1, config.KFOLD_COLUMN_NAME], axis=1, inplace=False
+    ).values
     y_valid = validation_set[1].values
 
     # parameter grid for Grid search
     param = {
-        'C': [0.01, 0.1, 1, 10, 100],
-        'gamma': [0.01, 0.1, 1, 10, 100],
-        'kernel':['rbf', 'linear']
+        "C": [0.01, 0.1, 1, 10, 100],
+        "gamma": [0.01, 0.1, 1, 10, 100],
+        "kernel": ["rbf", "linear"],
     }
 
     # model instantiation here
@@ -55,10 +59,10 @@ def run(dataset, fold, GRIDCV):
         model = model_selection.GridSearchCV(
             estimator=classifier,
             param_grid=param,
-            scoring='recall',
+            scoring="recall",
             verbose=False,
             n_jobs=3,
-            cv=5
+            cv=5,
         )
         # from the results we see: c=1, gamma=10 and kernel=rbf
         # train here
@@ -67,7 +71,7 @@ def run(dataset, fold, GRIDCV):
         preds = model.predict(X_valid)
 
         accuracy = accuracy_score(y_valid, preds)
-        p,r,f1,support = precision_recall_fscore_support(y_valid, preds)
+        p, r, f1, support = precision_recall_fscore_support(y_valid, preds)
 
         print(
             "---Fold={}---\nAccuracy={}\nPrecision={}\nRecall={}\nF1={}".format(
@@ -97,18 +101,20 @@ def run(dataset, fold, GRIDCV):
         )
 
         dl_obj = feature_engg.DumpLoadFile()
-        dl_obj.dump_file(classifier, str(config.BASELINE_MODEL_NAME) + str(fold) + ".pickle")
+        dl_obj.dump_file(
+            classifier, str(config.BASELINE_MODEL_NAME) + str(fold) + ".pickle"
+        )
 
     # return here
 
 
 def inference_stage(dataset, model):
-    '''
+    """
     Run model on test set and get performance metrics
     :param dataset: test set
     :param model: the model
     :return:
-    '''
+    """
     print(dataset.shape)
     X_test = dataset.drop([1], axis=1, inplace=False).values
     y_test = dataset[[1]].values
@@ -116,13 +122,9 @@ def inference_stage(dataset, model):
     preds = model.predict(X_test)
 
     accuracy = accuracy_score(y_test, preds)
-    p,r,f1,support = precision_recall_fscore_support(y_test, preds)
+    p, r, f1, support = precision_recall_fscore_support(y_test, preds)
 
-    print(
-        "\nAccuracy={}\nPrecision={}\nRecall={}\nF1={}".format(
-           accuracy, p, r, f1
-        )
-    )
+    print("\nAccuracy={}\nPrecision={}\nRecall={}\nF1={}".format(accuracy, p, r, f1))
 
 
 if __name__ == "__main__":
@@ -131,26 +133,31 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # adding the arguments
-    parser.add_argument('--clean', type=str,
-                        help='Provide argument \"--clean dataset\" to get clean train and test split.'
+    parser.add_argument(
+        "--clean",
+        type=str,
+        help='Provide argument "--clean dataset" to get clean train and test split.',
     )
 
-    parser.add_argument('--train', type=str,
-                        help='Provide argument \"--train skfold\" to train the model using Stratified'
-                             ' Kfold cross validation. Or use \"--train gridcv to use grid search.\"'
-                        )
+    parser.add_argument(
+        "--train",
+        type=str,
+        help='Provide argument "--train skfold" to train the model using Stratified'
+        ' Kfold cross validation. Or use "--train gridcv to use grid search."',
+    )
 
-
-    parser.add_argument('--test', type=str,
-                        help='Provide argument \"--test inference\" to test the model and'
-                             ' obtain performance metrics.'
-                        )
+    parser.add_argument(
+        "--test",
+        type=str,
+        help='Provide argument "--test inference" to test the model and'
+        " obtain performance metrics.",
+    )
 
     args = parser.parse_args()
     dl_obj = feature_engg.DumpLoadFile()
 
     # code when argument is cleaning data
-    if args.clean == 'dataset':
+    if args.clean == "dataset":
 
         fr_obj = feature_engg.FeatureEngineering()
 
@@ -167,7 +174,7 @@ if __name__ == "__main__":
         dl_obj.dump_file(clean_test_set, config.CLEAN_TEST_FILENAME)
 
     # code when training the model
-    elif args.train == 'skfold':
+    elif args.train == "skfold":
 
         # get the train data
         if os.path.isfile(config.CLEAN_TRAIN_FILENAME):
@@ -190,7 +197,7 @@ if __name__ == "__main__":
 
         # call run function for each fold
 
-    elif args.train == 'gridcv':
+    elif args.train == "gridcv":
 
         # get the train data
         if os.path.isfile(config.CLEAN_TRAIN_FILENAME):
@@ -212,7 +219,7 @@ if __name__ == "__main__":
             )
 
     # code when testing the model
-    elif args.test == 'inference':
+    elif args.test == "inference":
 
         # get the test data
         if os.path.isfile(config.CLEAN_TEST_FILENAME):

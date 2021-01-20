@@ -1,5 +1,5 @@
-''' Here all the configuration variables are kept
-which is used throughout this project'''
+""" Here all the configuration variables are kept
+which is used throughout this project"""
 
 # dataset information
 OUTPUT_FEATURE = 1
