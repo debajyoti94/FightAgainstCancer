@@ -55,23 +55,26 @@ class FeatureEngineering(MustHaveForFeatureEngineering):
             )
         return dataset
 
-    def cleaning_data(self, dataset, dataset_type):
+    def cleaning_data(self, dataset):
         '''
         overriding the cleaning data function from abc class
         :param dataset: dataset to be cleaned
-        :param dataset_type: TRAIN or TEST
-        :return: cleaned data
+        :return: cleaned data X, cleaned Y
         '''
 
         # apply label encoding to target class
         # 1 is the target class
-        dataset = self.label_encoder(dataset,[1])
+        # print(type(dataset))
+        encoded_features = self.label_encoder(dataset,[1])
+        dataset[1] = encoded_features
+        # print(type(dataset))
+        # print(dataset[[0,1]])
+        dataset.drop(['index',0], axis=1, inplace=True)
         # apply minmax scaling to remaining features
-        scaled_dataset = self.scaling_data(dataset.drop([0,1], axis=1,
-                                                        inplace=False))
+        scaled_dataset = self.scaling_data(dataset)
 
-        return scaled_dataset.drop([1], axis=1,
-                                   inplace=False), scaled_dataset[1]
+
+        return scaled_dataset
 
 
 
@@ -85,7 +88,7 @@ class FeatureEngineering(MustHaveForFeatureEngineering):
         sns_heatmap_plot.figure.savefig(config.NULL_CHECK_HEATMAP)
 
 
-class LoadDumpFile:
+class DumpLoadFile:
 
     def load_file(self, filename):
         '''
