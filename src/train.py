@@ -25,11 +25,11 @@ def run(dataset, fold, GRIDCV):
     validation_set = dataset[dataset.kfold == fold]
 
     # get X train, y train
-    X_train = train_set.drop([1, 'kfold'], axis=1, inplace=False).values
+    X_train = train_set.drop([1, config.KFOLD_COLUMN_NAME], axis=1, inplace=False).values
     y_train = train_set[1].values
 
     # get X valid, y valid
-    X_valid = validation_set.drop([1, 'kfold'], axis=1, inplace=False).values
+    X_valid = validation_set.drop([1, config.KFOLD_COLUMN_NAME], axis=1, inplace=False).values
     y_valid = validation_set[1].values
 
     # parameter grid for Grid search
@@ -123,7 +123,7 @@ def inference_stage(dataset, model):
            accuracy, p, r, f1
         )
     )
-    return
+
 
 if __name__ == "__main__":
 
@@ -174,7 +174,7 @@ if __name__ == "__main__":
             clean_train_set = dl_obj.load_file(config.CLEAN_TRAIN_FILENAME)
 
             # for stratified k fold cross validation
-            clean_train_set['kfold'] = -1
+            clean_train_set[config.KFOLD_COLUMN_NAME] = -1
             skfold_obj = create_folds.SKFolds()
             clean_train_set = skfold_obj.create_folds(clean_train_set)
 
@@ -197,7 +197,7 @@ if __name__ == "__main__":
             clean_train_set = dl_obj.load_file(config.CLEAN_TRAIN_FILENAME)
 
             # for stratified k fold cross validation
-            clean_train_set['kfold'] = -1
+            clean_train_set[config.KFOLD_COLUMN_NAME] = -1
             skfold_obj = create_folds.SKFolds()
             clean_train_set = skfold_obj.create_folds(clean_train_set)
 
