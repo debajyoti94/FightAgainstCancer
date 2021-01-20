@@ -4,7 +4,7 @@ from sklearn import model_selection
 import config
 
 
-class SKFold:
+class SKFolds:
 
     def create_folds(self, dataset_df):
         '''
