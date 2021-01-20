@@ -8,7 +8,8 @@ import argparse
 import os
 
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from sklearn.metrics import accuracy_score, \
+                            precision_recall_fscore_support
 from sklearn import model_selection
 
 
@@ -46,14 +47,15 @@ def run(dataset, fold, GRIDCV):
     # model instantiation here
     classifier = SVC()
 
-    if GRIDCV == True:
+    if GRIDCV:
         # initialise grid search
         # estimator is the model that we have defined
         # param_grid is the grid of parameters
         # scoring is the metric for choosing the best parameters
         # in our case, it is cancer detection, so FN is more important that FP,
         # hence recall is being looked into
-        # higher verbose means more detailed explanation is printed during training
+        # higher verbose means more detailed explanation
+        # is printed during training
         # n_jobs is the number of jobs running in parallel
         # cv means that we are using 5 fold cv (not stratified)
         model = model_selection.GridSearchCV(
@@ -84,9 +86,10 @@ def run(dataset, fold, GRIDCV):
             print("{}:{}".format(param_name, best_params[param_name]))
 
         dl_obj = feature_engg.DumpLoadFile()
-        dl_obj.dump_file(model, str(config.GRIDCV_MODEL_NAME) + str(fold) + ".pickle")
+        dl_obj.dump_file(model, str(config.GRIDCV_MODEL_NAME)
+                                    + str(fold) + ".pickle")
 
-    elif GRIDCV == False:
+    elif GRIDCV:
 
         classifier.fit(X_train, y_train)
         preds = classifier.predict(X_valid)
@@ -124,7 +127,8 @@ def inference_stage(dataset, model):
     accuracy = accuracy_score(y_test, preds)
     p, r, f1, support = precision_recall_fscore_support(y_test, preds)
 
-    print("\nAccuracy={}\nPrecision={}\nRecall={}\nF1={}".format(accuracy, p, r, f1))
+    print("\nAccuracy={}\nPrecision={}\nRecall={}\nF1={}".format(accuracy,
+                                                                 p, r, f1))
 
 
 if __name__ == "__main__":
@@ -142,8 +146,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--train",
         type=str,
-        help='Provide argument "--train skfold" to train the model using Stratified'
-        ' Kfold cross validation. Or use "--train gridcv to use grid search."',
+        help='Provide argument "--train skfold" to train'
+             ' the model using Stratified'
+             ' Kfold cross validation. '
+             'Or use "--train gridcv to use grid search."',
     )
 
     parser.add_argument(
@@ -191,8 +197,10 @@ if __name__ == "__main__":
 
         else:
             print(
-                "Training set does not exist. Please obtain the train set first.\n"
-                'Use "python train.py --clean dataset" to get the train and test set.'
+                "Training set does not exist."
+                " Please obtain the train set first.\n"
+                'Use "python train.py --clean dataset" to get '
+                'the train and test set.'
             )
 
         # call run function for each fold
@@ -214,8 +222,10 @@ if __name__ == "__main__":
 
         else:
             print(
-                "Training set does not exist. Please obtain the train set first.\n"
-                'Use "python train.py --clean dataset" to get the train and test set.'
+                "Training set does not exist."
+                " Please obtain the train set first.\n"
+                'Use "python train.py --clean dataset" to get'
+                ' the train and test set.'
             )
 
     # code when testing the model
@@ -232,7 +242,9 @@ if __name__ == "__main__":
 
         else:
             print(
-                "Test set does not exist. Please obtain the Test set first.\n"
-                'Use "python train.py --clean dataset" to get the train and test set.'
+                "Test set does not exist."
+                " Please obtain the Test set first.\n"
+                'Use "python train.py --clean dataset" to get the'
+                ' train and test set.'
             )
         # and get test results

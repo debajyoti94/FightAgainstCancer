@@ -19,7 +19,8 @@ class SKFolds:
 
         y = dataset_df[config.OUTPUT_FEATURE].values
 
-        for fold_value, (t_, y_index) in enumerate(kf.split(X=dataset_df, y=y)):
+        for fold_value, (t_, y_index) in enumerate(kf.split(X=dataset_df,
+                                                            y=y)):
             dataset_df.loc[y_index, config.KFOLD_COLUMN_NAME] = fold_value
 
         return dataset_df

@@ -1,9 +1,10 @@
 """ In this code we will perform data cleaning operations"""
 
 import abc
+
 import pickle
 import seaborn as sns
-import pandas as pd
+
 import sklearn.preprocessing as preproc
 
 # create an abc for feature engineering class
@@ -32,11 +33,13 @@ class MustHaveForFeatureEngineering:
 
 
 class FeatureEngineering(MustHaveForFeatureEngineering):
-    def label_encoder(self, dataset, features_to_encode):
+
+    def label_encoder(self, dataset,
+                      features_to_encode):
         """
         For handling categorical features. In this case, for handling target feature.
-        :param data:
-        :param features_to_encode:
+        :param dataset: input data
+        :param features_to_encode: features that we want to encode
         :return: encoded feature
         """
         le = preproc.LabelEncoder()
