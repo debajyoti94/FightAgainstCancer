@@ -9,8 +9,10 @@ import os
 
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from sklearn import model_selection
 
-def run(dataset, fold):
+
+def run(dataset, fold, GRIDCV):
     '''
 
     :param dataset: training data
@@ -30,25 +32,62 @@ def run(dataset, fold):
     X_valid = validation_set.drop([1, 'kfold'], axis=1, inplace=False).values
     y_valid = validation_set[1].values
 
+    # parameter grid for Grid search
+    param = {
+        'C': [0.01, 0.1, 1, 10, 100],
+        'gamma': [0.01, 0.1, 1, 10, 100],
+        'kernel':['rbf', 'linear']
+    }
+
     # model instantiation here
-    model = SVC()
+    classifier = SVC()
 
-    # train here
-    model.fit(X_train, y_train)
-
-    preds = model.predict(X_valid)
-
-    accuracy = accuracy_score(y_valid, preds)
-    p,r,f1,support = precision_recall_fscore_support(y_valid, preds)
-
-    print(
-        "---Fold={}---\nAccuracy={}\nPrecision={}\nRecall={}\nF1={}".format(
-            fold, accuracy, p, r, f1
+    if GRIDCV == True:
+        model = model_selection.GridSearchCV(
+            estimator=classifier,
+            param_grid=param,
+            scoring='recall',
+            verbose=4,
+            n_jobs=3,
+            cv=5
         )
-    )
+        # train here
+        model.fit(X_train, y_train)
 
-    dl_obj = feature_engg.DumpLoadFile()
-    dl_obj.dump_file(model, str(config.MODEL_NAME) + str(fold) + ".pickle")
+        preds = model.predict(X_valid)
+
+        accuracy = accuracy_score(y_valid, preds)
+        p,r,f1,support = precision_recall_fscore_support(y_valid, preds)
+
+        print(
+            "---Fold={}---\nAccuracy={}\nPrecision={}\nRecall={}\nF1={}".format(
+                fold, accuracy, p, r, f1
+            )
+        )
+
+        best_params = model.best_estimator_.get_params()
+        for param_name in best_params.keys():
+            print("{}:{}".format(param_name, best_params[param_name]))
+
+        dl_obj = feature_engg.DumpLoadFile()
+        dl_obj.dump_file(model, str(config.GRIDCV_MODEL_NAME) + str(fold) + ".pickle")
+
+    elif GRIDCV == False:
+
+        classifier.fit(X_train, y_train)
+        preds = classifier.predict(X_valid)
+
+        accuracy = accuracy_score(y_valid, preds)
+        p, r, f1, support = precision_recall_fscore_support(y_valid, preds)
+
+        print(
+            "---Fold={}---\nAccuracy={}\nPrecision={}\nRecall={}\nF1={}".format(
+                fold, accuracy, p, r, f1
+            )
+        )
+
+        dl_obj = feature_engg.DumpLoadFile()
+        dl_obj.dump_file(classifier, str(config.BASELINE_MODEL_NAME) + str(fold) + ".pickle")
 
     # return here
 
@@ -88,8 +127,9 @@ if __name__ == "__main__":
 
     parser.add_argument('--train', type=str,
                         help='Provide argument \"--train skfold\" to train the model using Stratified'
-                             ' Kfold cross validation'
+                             ' Kfold cross validation. Or use \"--train gridcv to use grid search.\"'
                         )
+
 
     parser.add_argument('--test', type=str,
                         help='Provide argument \"--test inference\" to test the model and'
@@ -130,7 +170,7 @@ if __name__ == "__main__":
 
             # train the model
             for fold in range(config.NUM_FOLDS):
-                run(clean_train_set, fold)
+                run(clean_train_set, fold, GRIDCV=False)
 
         else:
             print(
@@ -139,6 +179,27 @@ if __name__ == "__main__":
             )
 
         # call run function for each fold
+
+    elif args.train == 'gridcv':
+
+        # get the train data
+        if os.path.isfile(config.CLEAN_TRAIN_FILENAME):
+            clean_train_set = dl_obj.load_file(config.CLEAN_TRAIN_FILENAME)
+
+            # for stratified k fold cross validation
+            clean_train_set['kfold'] = -1
+            skfold_obj = create_folds.SKFolds()
+            clean_train_set = skfold_obj.create_folds(clean_train_set)
+
+            # train the model
+            for fold in range(config.NUM_FOLDS):
+                run(clean_train_set, fold, GRIDCV=True)
+
+        else:
+            print(
+                "Training set does not exist. Please obtain the train set first.\n"
+                'Use "python train.py --clean dataset" to get the train and test set.'
+            )
 
     # code when testing the model
     elif args.test == 'inference':
