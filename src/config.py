@@ -27,4 +27,4 @@ BEST_MODEL = "../models/SVM_wdbc_Baseline_0.pickle"
 
 FILE_DELIMITER = ","
 ENCODING_TYPE = "UTF-8"
-DATASET_SHAPE = (569, 32)
+DATASET_SHAPE = (568, 32)
