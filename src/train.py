@@ -43,14 +43,24 @@ def run(dataset, fold, GRIDCV):
     classifier = SVC()
 
     if GRIDCV == True:
+        # initialise grid search
+        # estimator is the model that we have defined
+        # param_grid is the grid of parameters
+        # scoring is the metric for choosing the best parameters
+        # in our case, it is cancer detection, so FN is more important that FP,
+        # hence recall is being looked into
+        # higher verbose means more detailed explanation is printed during training
+        # n_jobs is the number of jobs running in parallel
+        # cv means that we are using 5 fold cv (not stratified)
         model = model_selection.GridSearchCV(
             estimator=classifier,
             param_grid=param,
             scoring='recall',
-            verbose=4,
+            verbose=False,
             n_jobs=3,
             cv=5
         )
+        # from the results we see: c=1, gamma=10 and kernel=rbf
         # train here
         model.fit(X_train, y_train)
 
