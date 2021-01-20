@@ -21,7 +21,8 @@ NUM_FOLDS = 5
 KFOLD_COLUMN_NAME = "kfold"
 
 # model name
-MODEL_NAME = "../models/SVM_wdbc_Baseline_"
+BASELINE_MODEL_NAME = "../models/SVM_wdbc_Baseline_"
+GRIDCV_MODEL_NAME = "../models/SVM_wdbc_GRIDCV_"
 BEST_MODEL = "../models/SVM_wdbc_Baseline_0.pickle"
 
 FILE_DELIMITER = ","
