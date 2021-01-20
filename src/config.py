@@ -4,19 +4,25 @@ which is used throughout this project'''
 # dataset information
 OUTPUT_FEATURE = 1
 CATEGORICAL_VARIABLES = [1]
+
 ORIGINAL_DATASET_FILENAME = "../input/wdbc.data"
-TRAIN_FILENAME = "../input/train_set.pickle"
-TEST_FILENAME = "../input/test_set.pickle"
+
+RAW_TRAIN_FILENAME = "../input/train_set.pickle"
+RAW_TEST_FILENAME = "../input/test_set.pickle"
+
+CLEAN_TRAIN_FILENAME = "../input/clean_train_set.pickle"
+CLEAN_TEST_FILENAME = "../input/clean_test_set.pickle"
 
 # for plots
 NULL_CHECK_HEATMAP = "../plots/null_check_heatmap.png"
 
 # for cross validation
 NUM_FOLDS = 5
+KFOLD_COLUMN_NAME = "kfold"
 
 # model name
 MODEL_NAME = "../models/SVM_wdbc_Baseline_"
-# BEST_MODEL = "../models/SVM_wdbc"
+BEST_MODEL = "../models/SVM_wdbc_Baseline_0.pickle"
 
 FILE_DELIMITER = ","
 ENCODING_TYPE = "UTF-8"
